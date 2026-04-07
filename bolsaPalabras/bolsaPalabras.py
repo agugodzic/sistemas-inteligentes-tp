@@ -1,5 +1,7 @@
 import re
+import unicodedata
 import textos
+import unicodedata
 
 vocabulario = ["investigación","Desarrollo", "Datos", "Importante", "Avances", "Tecnología",
 "Futuro", "Historia", "Mundo", "Cambio", "Sociedad", "Humanidad", "Descubrimiento",
@@ -7,36 +9,46 @@ vocabulario = ["investigación","Desarrollo", "Datos", "Importante", "Avances", 
 "Civilización", "Revolución", "Imperio", "Conquista", "Renacimiento", "Edad Media",
 "Colonialismo", "Independencia", "Evolución"]
 
-    
-# Genera una lista de diccionarios con {indice, palabra} para cada palabra del vocabulario.
-# Además convierte todas las letras a minusculas.
-def vocabulario_indexado():
-    vocabulario_indexado = []
-    indice_actual = 0
-    
-    for palabra in vocabulario:
-        vocabulario_indexado.append({"indice": indice_actual, "palabra": palabra.lower()})
-        indice_actual += 1
 
-    return vocabulario_indexado
+# Elimina las acentos de una palabra dada
+def quitar_acentos(p):
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', p)
+        if unicodedata.category(c) != 'Mn'
+    )
+    
+# Convierte a minusculas, elimina acentos y plural (solo para plural simple, ej: dias -> dia
+def formatear_palabra(p):
+    p = p.lower()
+    p = quitar_acentos(p)
+    
+    if p.endswith("s"):
+        p = p[:-1]
+        
+    return p
 
+
+
+# Formatea cada una de las palabras del vocabulario para facilitar la comparación
+def vocabulario_formateado():
+    return [formatear_palabra(palabra) for palabra in vocabulario]
 
 
 # Cuenta las apariciones de cada palabra del vocabulario en el texto dado
 # y usa expresiones regulares para separar las palabras del texto, 
 # ignorando simbolos y convirtiendo a minusculas    
 def contar_palabras(texto):
-    vocab_indexado = vocabulario_indexado()
+    vocab_indexado = vocabulario_formateado()
     
     # inicializo vector con ceros, con la misma longitud que el vocabulario indexado
     vector = [0] * len(vocab_indexado)
     
-    palabras = re.findall(r'\b\w+\b', texto.lower())
+    palabras = re.findall(r'\b\w+\b', texto)
     
     for palabra in palabras:
         for item in vocab_indexado:
-            if palabra == item['palabra']:
-                vector[item['indice']] += 1
+            if formatear_palabra(palabra) == item:
+                vector[vocab_indexado.index(item)] += 1
                 
     return vector
 
@@ -51,6 +63,7 @@ def normalizar(conteos):
 def contar_y_normalizar(texto):
     conteos = contar_palabras(texto)
     return normalizar(conteos)
+
 
 # Calcula la similitud coseno entre dos vectores dados
 def calcular_similitud_coseno(vector1, vector2):
@@ -67,7 +80,9 @@ def calcular_similitud_coseno(vector1, vector2):
 
 
 def punto1():
-    print("Punto 1: Vocabulario indexado:\n\n")
+    print("\nEJERCICIO 3: BOLSA DE PALABRAS\n\n")
+    
+    print("Punto 1: Vocabulario indexado:\n")
     contador = 0;
     
     print ("INDICE     PALABRA")
@@ -189,7 +204,7 @@ def punto4():
 
     print("Punto 4: Calculo de similitud coseno entre los textos desconocidos y los temas conocidos:\n(La similitud coseno de cada comparacion se muestra en la interseccion de cada fila y columna correspondientes)\n\n")
 
-    print("-                          DESCONOCIDO 0                     DESCONOCIDO 1                     DESCONOCIDO 2   ")
+    print("///////                    DESCONOCIDO 0                     DESCONOCIDO 1                     DESCONOCIDO 2   ")
     print(f"CIENCIA Y TECNOLOGIA         { str(round(similitud_ciencia_tecnologia_y_desconocido_0, 2)).ljust(34) + str(round(similitud_ciencia_tecnologia_y_desconocido1, 2)).ljust(34) + str(round(similitud_ciencia_tecnologia_y_desconocido_2, 2)).ljust(34)}")
     print(f"HISTORIA Y SOCIEDAD          { str(round(similitud_historia_sociedad_y_desconocido_0, 2)).ljust(34) + str(round(similitud_historia_sociedad_y_desconocido_1, 2)).ljust(34) + str(round(similitud_historia_sociedad_y_desconocido_2, 2)).ljust(34)}")
     print(f"MEDIO AMBIENTE               { str(round(similitud_medio_ambiente_y_desconocido_0, 2)).ljust(34) + str(round(similitud_medio_ambiente_y_desconocido_1, 2)).ljust(34) + str(round(similitud_medio_ambiente_y_desconocido_2, 2)).ljust(34)}")
@@ -197,10 +212,23 @@ def punto4():
     print("\n\n")
 
 
+def punto5():
+    print(""" \n\n
+Punto 5: A partir del analisis de los puntos anteriores, podemos clasificar los textos Desconocido 0, desconocido 1 y desconocido 2 por tématica, de acuerdo a la similitud de cada uno con los textos dados.
+- Desconocido 0 tiene mayor similitud con "Historia y Sociedad", ya que obtuvo una similitud coseno de 0.82 con el texto de dicha temática. Mientras que con Ciencia y Tecnología y Medio Ambiente obtuvo 0.57 y 0.67 respectivamente.
+- Desconocido 1 podria clasificarse como "Ciencia y Tecnología" con una similitud de 0.72. Manteniendo una similitud moderada con "Medio Ambiente" (0.53) y encontrandose lejos de "Historia y Sociedad" (0.3).
+- Desconocido 2 por su parte puede identificarse con "Historia y Sociedad" (0.72), ahounque no se encuentra lejos de Medio Ambiente ni tan lejos de "Ciencia y tecnologia".
+
+Ninguno de los tres textos puede clasificarse exclusivamente con una temática en particular, sino que coinciden en mayor o menor medida con distintas temáticas. Sin embargo, podemos identificar con cual temática tiene mayor similitud.
+
+Aclaración: Para mejorar el calculo de similitud, formateamos previamente de cada una de las palabras de los textos y del vocabulario, eliminando acentos, puntuación, pluralización simple y convirtiendo a minusculas. Esto nos permitió obtener una similitud coseno más precisa, pero a su vez puede diferir de otros analisis realizados con otras metodologías.
+    """)
+    
+
 punto1()        
 punto2()
 punto3()
 punto3b()
 punto4()
-
+punto5()
 
