@@ -1,7 +1,6 @@
 import re
 import unicodedata
 import textos
-import unicodedata
 
 vocabulario = ["investigación","Desarrollo", "Datos", "Importante", "Avances", "Tecnología",
 "Futuro", "Historia", "Mundo", "Cambio", "Sociedad", "Humanidad", "Descubrimiento",
@@ -224,11 +223,3 @@ Ninguno de los tres textos puede clasificarse exclusivamente con una temática e
 Aclaración: Para mejorar el calculo de similitud, formateamos previamente de cada una de las palabras de los textos y del vocabulario, eliminando acentos, puntuación, pluralización simple y convirtiendo a minusculas. Esto nos permitió obtener una similitud coseno más precisa, pero a su vez puede diferir de otros analisis realizados con otras metodologías.
     """)
     
-
-punto1()        
-punto2()
-punto3()
-punto3b()
-punto4()
-punto5()
-
